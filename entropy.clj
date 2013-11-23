@@ -2,17 +2,17 @@
 ; Programmer: J. van Donsel
 ;
 ;Takes a file of sample text and generates new random text with similar statistical
-;properties.
+;properties. 
 
-(def DEPTH 8)
+(def DEPTH 3)          ; Lookahead when gathering statistics
+(def PRINT_LIMIT 500)  ; Amount of new text to generate.
+
 (def source-file "LifeOnTheMississippi-1.txt")
 
 (println "File:" source-file " Depth:" DEPTH)
 
 ; Load our sample text
 (def text (slurp source-file))
-
-;(println "Done loading text")
 
 ; Generate a letter list
 (def valid-chars (set (concat 
@@ -38,28 +38,23 @@
 ; sort sequences to detect duplices
 (def s (sort-by #(apply str %) parts))
 
-;(println "Done sorting text")
-
 ; split into sub-lists of identical items
 (def p (partition-by identity s))
 
 ;(println "Done grouping text, " (count p) " groups")
 
 ; generate a map of unique letter sequences against their count
-(def observed (zipmap (map first p) (map count p)))
-
-;(println "Done generating observed")
+(def observed-map (zipmap (map first p) (map count p)))
 
 ; pretty printing
-;(doseq [e (sort-by last observed)] (println (first e) " " (second e)))
+;(doseq [e (sort-by last observed-map)] (println (first e) " " (second e)))
 
 
-
-; Pick one letter sequence to start with. Should really do this
+; Pick one random letter sequence to start with. Should really do this
 ; based on probability. Returns a list of 'DEPTH' letters, formed
 ; by dropping the last letter of an observed sequence.
-(def first-n-letters  (butlast (nth (keys observed) 
-                                   (rand-int (count (keys observed))))))
+(def first-n-letters  (butlast (nth (keys observed-map) 
+                                   (rand-int (count (keys observed-map))))))
 
 ; Function to pick a random letter
 ; TODO: This should be weighted 
@@ -72,11 +67,11 @@
 ; Find all the observed letter combinations that start with the last-n letters, 
 ; by generating all possible n+1 letter combinations starting with the last-n letters.
 ; Return this as pairs of strings and frequency
-(defn frequency [last-n] (map #(list % (get observed %)) (map #(concat last-n (list %)) valid-chars)))
+(defn frequency [last-n] (map #(list % (get observed-map %)) (map #(concat last-n (list %)) valid-chars)))
 
 ; Pick the next letter, given the last n
 (defn next-pick [last-n]
-      ; Pick a random observed string (starting with last-n) with a non-nil frequency.
+      ; Pick a random observed string with a non-nil frequency, given the previous DEPTH letters.
       ; TODO: We should weight this with frequency
       ; Throw away the frequency part, just take the letters.
       (let [choices (remove #(nil? (last %))  (frequency last-n))
@@ -98,7 +93,7 @@
           )))
 
 ; Run the whole thing
-(generate first-n-letters 500)
+(generate first-n-letters PRINT_LIMIT)
 
 
 
