@@ -4,12 +4,10 @@
 ;Takes a file of sample text and generates new random text with similar statistical
 ;properties.
 
-(use '[clojure.contrib.seq-utils])
-
-(def depth 8)
+(def DEPTH 8)
 (def source-file "LifeOnTheMississippi-1.txt")
 
-(println "File:" source-file " Depth:" depth)
+(println "File:" source-file " Depth:" DEPTH)
 
 ; Load our sample text
 (def text (slurp source-file))
@@ -32,8 +30,8 @@
 
 ;(println "Done filtering text:" (apply str filtered-text))
 
-; partition into all possible consecuive sequences of length 'depth+1'
-(def parts (partition (inc depth) 1 filtered-text))
+; partition into all possible consecuive sequences of length 'DEPTH+1'
+(def parts (partition (inc DEPTH) 1 filtered-text))
 
 ;(println "Done partitioning text, length " (count filtered-text) " characters")
 
@@ -58,7 +56,7 @@
 
 
 ; Pick one letter sequence to start with. Should really do this
-; based on probability. Returns a list of 'depth' letters, formed
+; based on probability. Returns a list of 'DEPTH' letters, formed
 ; by dropping the last letter of an observed sequence.
 (def first-n-letters  (butlast (nth (keys observed) 
                                    (rand-int (count (keys observed))))))
