@@ -82,18 +82,16 @@
           (last choice) ; Take the last character in the new sequence
           )))
 
-; Generate text based on statistics of the input text. One character per loop.
-(defn generate [last-n limit]
-      (let [c (next-pick last-n)]
-        (doseq []
-          (print c)
-          (if (zero? limit)
-           (println)
-            (recur (concat (drop 1 last-n) (list c)) (dec limit)))
-          )))
+; Generate text based on statistics of the input text. Adds one character per recursion.
+(defn generate [output last-n limit]
+  (let [c (next-pick last-n)]
+       (if (zero? limit)
+           output
+           (recur (concat output (list c)) (concat (drop 1 last-n) (list c)) (dec limit)))
+       ))
 
 ; Run the whole thing
-(generate first-n-letters PRINT_LIMIT)
+(print (apply str (generate [] first-n-letters PRINT_LIMIT)))
 
 
 
