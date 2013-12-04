@@ -93,6 +93,8 @@
 ; Run the whole thing
 (print (apply str (generate [] first-n-letters PRINT_LIMIT)))
 
+(println)
+
 
 
 
